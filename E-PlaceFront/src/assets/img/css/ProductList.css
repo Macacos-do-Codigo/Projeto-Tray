@@ -1,0 +1,187 @@
+/* Estilos para input de número */
+input[type="number"]::-webkit-outer-spin-button,
+input[type="number"]::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+input[type="number"] {
+  -moz-appearance: textfield;
+}
+
+/* Título do histórico */
+.titulo-historico {
+  color: #FFBD59;
+  font-size: 30px;
+  font-weight: bold;
+  margin-bottom: 0px;
+}
+
+/* Header */
+.header-container {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  max-width: 900px;
+  margin-bottom: 20px;
+}
+
+.actions {
+  margin-left: 20px;
+}
+
+.actions .btn-primary {
+  background-color: #FFBD59;
+  border: none;
+  padding: 10px 20px;
+  font-size: 14px;
+  font-weight: bold;
+  color: white;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+/* Tabela */
+.table-container {
+  padding: 20px;
+  border-radius: 15px;
+  width: 100%;
+  max-width: 1200px;
+  overflow-x: auto;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  background-color: white;
+}
+
+th, td {
+  border: 1px solid #FFBD59;
+  font-weight: bold;
+  padding: 12px 8px;
+  text-align: center;
+  height: 50px;
+}
+
+th {
+  background-color: #FFBD59;
+  color: white;
+  font-size: 16px;
+}
+
+td {
+  background-color: #FFF6E0;
+  font-size: 14px;
+}
+
+/* Paginação */
+.pagination {
+  margin-top: 20px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.pagination button {
+  margin: 0 10px;
+  padding: 8px 16px;
+  border: none;
+  background-color: #FFBD59;
+  color: white;
+  cursor: pointer;
+  border-radius: 5px;
+  font-size: 14px;
+  font-weight: bold;
+}
+
+.pagination button:disabled {
+  background-color: #FFBD59;
+  cursor: not-allowed;
+}
+
+/* Modal */
+.modal-dialog {
+  max-width: 700px;
+  margin: 40px auto;
+}
+
+.modal-content {
+  padding: 30px;
+  background-color: #fff;
+  border-radius: 20px;
+  box-shadow: 0 6px 15px rgba(0, 0, 0, 0.2);
+}
+
+.modal-header {
+  border-bottom: none;
+}
+
+.modal-custom-color {
+  background-color: #FFBD59 !important;
+  color: white;
+}
+
+.modal-footer {
+  border-top: none;
+  display: flex;
+  justify-content: center;
+}
+
+.modal-footer .btn-secondary {
+  background-color: #ccc;
+  border: none;
+  color: black;
+}
+
+.modal-footer .btn-primary {
+  background-color: #FFBD59;
+  border: none;
+  color: white;
+}
+
+/* Estilização para checkboxes de ecommerce */
+.ecommerce-flags {
+  display: flex;
+  justify-content: space-between;
+}
+
+.ecommerce-flags .form-check {
+  flex: 1;
+  margin-right: 10px;
+}
+
+.ecommerce-flags .form-check:last-child {
+  margin-right: 0;
+}
+
+/* Inputs e formulário */
+.form-control {
+  border: 2px solid #FFBD59;
+  border-radius: 5px;
+  padding: 10px;
+}
+
+.form-group label {
+  font-size: 14px;
+  font-weight: bold;
+  color: #333;
+}
+
+.form-group input::placeholder {
+  color: #ccc;
+}
+
+/* Erro */
+.error {
+  color: red;
+  font-weight: bold;
+  margin-top: 10px;
+  font-size: 14px;
+}
+
+/* Mensagem de "sem produtos" */
+.no-products-message {
+  color: #FFBD59;
+}

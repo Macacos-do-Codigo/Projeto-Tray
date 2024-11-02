@@ -1,0 +1,32 @@
+{
+  "name": "projeto_tray",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "@vue/runtime-dom": "^3.4.27",
+    "@vueuse/core": "^10.9.0",
+    "axios": "^1.7.7",
+    "body-parser": "^1.20.2",
+    "bootstrap": "^5.3.3",
+    "cors": "^2.8.5",
+    "express": "^4.19.2",
+    "mysql": "^2.18.1",
+    "mysql2": "^3.10.0",
+    "projeto_tray": "file:",
+    "v-money": "^0.8.1",
+    "vue": "^3.4.21",
+    "vue-masked-input": "^0.5.2",
+    "vue-router": "^4.3.0"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-vue": "^5.0.4",
+    "vite": "^5.4.10",
+    "vite-plugin-vue-devtools": "^7.0.25"
+  }
+}
