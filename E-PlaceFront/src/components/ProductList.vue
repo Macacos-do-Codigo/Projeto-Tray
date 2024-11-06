@@ -23,16 +23,16 @@
           </thead>
           <tbody>
             <tr v-for="(product, index) in paginatedProducts" :key="product.id">
-              <td>{{ product.id }}</td>
-              <td>{{ product.modelo }}</td>
-              <td>{{ product.marca }}</td>
-              <td v-if="product.preço">R$ {{ product.preço.toFixed(2) }}</td>
+              <td>{{ product.id || '' }}</td>
+              <td>{{ product.modelo || '' }}</td>
+              <td>{{ product.marca || '' }}</td>
+              <td v-if="product.preço">{{ formatarPreco(product.preço) }}</td>
               <td v-else></td>
               <td>{{ formatarEcommerce(product) }}</td>
-              <td>{{ product.quantidadeEmEstoque }}</td>
+              <td>{{ product.quantidadeEmEstoque || '' }}</td>
               <td>{{ formatarData(product.dataCadastro) }}</td>
               <td>
-                <i @click="selecionarProdutoParaExcluir(index)" class="bi bi-trash"></i>
+                <i @click="excluirProduto(index)" class="bi bi-trash" title="Excluir"></i>
               </td>
             </tr>
             <tr v-if="products.length === 0">
@@ -99,7 +99,6 @@
 </template>
 
 <script>
-import api from "../router/api";
 import "../assets/img/css/ProductList.css";
 
 export default {
@@ -108,19 +107,15 @@ export default {
     return {
       products: [],
       produto: {
+        id: 0,
         modelo: '',
         marca: '',
         preço: 0,
         quantidadeEmEstoque: 0,
         mercadoLivre: false,
         aliExpress: false,
-        shopee: false,
-        dataCadastro: ''
+        shopee: false
       },
-      produtoParaExcluir: null,
-      error: '',
-      showModal: false,
-      showDeleteModal: false,
       currentPage: 1,
       itemsPerPage: 6
     };
@@ -140,6 +135,7 @@ export default {
   methods: {
     abrirModalCadastro() {
       this.produto = {
+        id: 0,
         modelo: '',
         marca: '',
         preço: 0,
@@ -148,20 +144,14 @@ export default {
         aliExpress: false,
         shopee: false
       };
-      this.showModal = true;
       this.$nextTick(() => {
         const modalElement = new bootstrap.Modal(document.getElementById('escolhaEcommerceModal'));
         modalElement.show();
       });
     },
-    async getProducts() {
-      try {
-        const response = await api.get("/Produtos");
-        this.products = response.data;
-      } catch (error) {
-        console.error("Erro ao obter produtos:", error);
-        this.products = [];
-      }
+    getProducts() {
+      // Simulando produtos iniciais sem buscar do backend
+      this.products = [];
     },
     formatarData(data) {
       const date = new Date(data);
@@ -174,9 +164,12 @@ export default {
       if (product.shopee) ecommerces.push('Shopee');
       return ecommerces.join(', ');
     },
+    formatarPreco(preco) {
+      return `R$ ${preco.toFixed(2).replace('.', ',')}`;
+    },
     mascararValor(event) {
       let valor = event.target.value;
-      valor = valor.replace(/\D/g, ""); // Remove caracteres não numéricos
+      valor = valor.replace(/\D/g, "");
       valor = (valor / 100).toFixed(2).replace(".", ",");
       valor = valor.replace(/\B(?=(\d{3})+(?!\d))/g, ".");
       event.target.value = valor;
@@ -185,47 +178,51 @@ export default {
     formatarValor(event) {
       let valor = event.target.value;
       if (!valor.includes(",")) {
-        valor += ",00"; // Adiciona centavos se estiverem faltando
+        valor += ",00";
       }
       event.target.value = valor;
       this.produto.preço = parseFloat(valor.replace(".", "").replace(",", "."));
     },
-    async salvarProduto() {
-      try {
-        const response = await api.post("/Produtos", this.produto);
-        
-        // Adiciona o novo produto à lista local de produtos
-        this.products.push(response.data);
-        
-        // Fecha o modal de forma segura
-        const modalElement = bootstrap.Modal.getInstance(document.getElementById('escolhaEcommerceModal'));
-        if (modalElement) modalElement.hide();
-        
-        // Atualiza o estado para garantir fechamento do modal
-        this.showModal = false;
+    salvarProduto() {
+      // Converte o valor do preço para o formato numérico correto
+      this.produto.preço = parseFloat(this.produto.preço.toString().replace(/\./g, '').replace(',', '.'));
+      
+      // Adiciona a data de cadastro
+      this.produto.dataCadastro = new Date().toISOString();
 
-        // Limpa o formulário
-        this.produto = {
-          modelo: '',
-          marca: '',
-          preço: 0,
-          quantidadeEmEstoque: 0,
-          mercadoLivre: false,
-          aliExpress: false,
-          shopee: false
-        };
-      } catch (error) {
-        console.error("Erro ao salvar o produto:", error.response ? error.response.data : error);
+      console.log("Cadastrando produto localmente:", this.produto);
+
+      // Adiciona o produto diretamente à lista local
+      this.products.push({ ...this.produto });
+
+      // Fecha o modal
+      const modalElement = bootstrap.Modal.getInstance(document.getElementById('escolhaEcommerceModal'));
+      if (modalElement) modalElement.hide();
+
+      // Limpa os campos do produto para novo cadastro
+      this.produto = {
+        id: 0,
+        modelo: '',
+        marca: '',
+        preço: 0,
+        quantidadeEmEstoque: 0,
+        mercadoLivre: false,
+        aliExpress: false,
+        shopee: false
+      };
+    },
+    excluirProduto(index) {
+      // Remove o produto da lista local
+      this.products.splice(index, 1);
+    },
+    previousPage() {
+      if (this.currentPage > 1) {
+        this.currentPage--;
       }
     },
     nextPage() {
       if (this.currentPage < this.totalPages) {
         this.currentPage++;
-      }
-    },
-    previousPage() {
-      if (this.currentPage > 1) {
-        this.currentPage--;
       }
     }
   }

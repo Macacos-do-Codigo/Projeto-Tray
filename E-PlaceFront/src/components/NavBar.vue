@@ -12,7 +12,7 @@
         </div>
         <div class="navbar-collapse justify-content-end">
           <template v-if="!isUserArea">
-            <button type="button" class=" custom-btn" @click="openLoginModal">
+            <button type="button" class="custom-btn" @click="openLoginModal">
               <strong>Login</strong>
             </button>
           </template>
@@ -27,7 +27,7 @@
           <div class="modal-body">
             <div class="container" id="container">
               <div class="form-container sign-up-container">
-                <form @submit.prevent="register">
+                <form @submit.prevent="authenticate('register')">
                   <h1 class="login">Criar Conta</h1>
                   <div class="social-container">
                     <a href="#" class="social"><i class="fab fa-facebook-f"></i></a>
@@ -42,7 +42,7 @@
                 </form>
               </div>
               <div class="form-container sign-in-container">
-                <form @submit.prevent="login">
+                <form @submit.prevent="authenticate('login')">
                   <h1 class="login">Entrar</h1>
                   <div class="social-container">
                     <a href="#" class="social"><i class="fab fa-facebook-f"></i></a>
@@ -61,12 +61,10 @@
                 <div class="overlay">
                   <div class="overlay-panel overlay-left">
                     <h1>Bem-vindo de Volta!</h1>
-                    <p></p>
                     <button class="ghost" id="signIn">Entrar</button>
                   </div>
                   <div class="overlay-panel overlay-right">
                     <h1>Olá, Amigo!</h1>
-                    <p></p>
                     <button class="ghost" id="signUp">Registrar</button>
                   </div>
                 </div>
@@ -95,15 +93,12 @@ export default {
     const registerEmail = ref('');
     const registerPassword = ref('');
     const loginModal = ref(null);
-    const loading = ref(false); // Indicador de carregamento
+    const loading = ref(false);
     let modal = null;
 
     const loginError = ref('');
     const registerError = ref('');
-    const users = ref([]); // Lista de usuários registrados
-
-    // Usuário administrador pré-cadastrado
-    const adminUser = { email: 'admin@eplace.com', password: 'admin123' };
+    const users = ref([]);
 
     onMounted(() => {
       if (loginModal.value) {
@@ -124,12 +119,12 @@ export default {
         });
       }
 
-      fetchUsers(); // Buscar usuários ao montar o componente
+      fetchUsers();
     });
 
     const fetchUsers = async () => {
       try {
-        const response = await api.get('/Usuario'); // GET para listar usuários
+        const response = await api.get('/Usuario');
         users.value = response.data;
       } catch (error) {
         console.error('Erro ao buscar usuários:', error);
@@ -147,82 +142,84 @@ export default {
       return re.test(String(email).toLowerCase());
     };
 
-    const login = async () => {
-  loginError.value = '';
-  loading.value = true;
+    const authenticate = async (type) => {
+      const isLogin = type === 'login';
+      const email = isLogin ? loginEmail.value : registerEmail.value;
+      const password = isLogin ? loginPassword.value : registerPassword.value;
 
-  if (!validateEmail(loginEmail.value)) {
-    loginError.value = 'Por favor, insira um email válido.';
-    loading.value = false;
-    return;
-  }
+      // Limpa mensagens de erro
+      if (isLogin) {
+        loginError.value = '';
+      } else {
+        registerError.value = '';
+      }
+      loading.value = true;
 
-  try {
-    // Chamada à nova rota de login no backend
-    const response = await api.post('/Usuario/login', {
-      email: loginEmail.value,
-      senha: loginPassword.value
-    });
+      // Validações
+      if (!validateEmail(email)) {
+        if (isLogin) {
+          loginError.value = 'Por favor, insira um email válido.';
+        } else {
+          registerError.value = 'Por favor, insira um email válido.';
+        }
+        loading.value = false;
+        return;
+      }
 
-    if (response.status === 200) {
-      localStorage.setItem('user', JSON.stringify(response.data));
-      modal.hide(); 
-      setTimeout(() => {
-        isUserArea.value = true;
-        router.push('/produtos');
-      }, 100);
-    } else {
-      loginError.value = 'Usuário ou senha incorretos. Tente novamente.';
-    }
-  } catch (error) {
-    loginError.value = 'Erro ao fazer login. Tente novamente mais tarde.';
-  } finally {
-    loading.value = false;
-  }
-};
+      if (!password || password.length < 6) {
+        if (isLogin) {
+          loginError.value = 'A senha deve ter pelo menos 6 caracteres.';
+        } else {
+          registerError.value = 'A senha deve ter pelo menos 6 caracteres.';
+        }
+        loading.value = false;
+        return;
+      }
 
-const register = async () => {
-  registerError.value = '';
-  loading.value = true;
+      try {
+        if (isLogin) {
+          // Obtendo todos os usuários
+          const response = await api.get('/Usuario');
+          const usersList = response.data;
 
-  if (!validateEmail(registerEmail.value)) {
-    registerError.value = 'Por favor, insira um email válido.';
-    loading.value = false;
-    return;
-  }
-
-  if (!registerPassword.value || registerPassword.value.length < 6) {
-    registerError.value = 'A senha deve ter pelo menos 6 caracteres.';
-    loading.value = false;
-    return;
-  }
-
-  try {
-    const response = await api.post('/Usuario', {
-      email: registerEmail.value,
-      senha: registerPassword.value,
-    });
-
-    if (response.status === 201) {
-      alert('Registro realizado com sucesso!');
-      modal.hide(); 
-      setTimeout(() => {
-        isUserArea.value = true;
-        router.push('/produtos'); // Redireciona para a página de cadastro de produtos
-      }, 100);
-    } else {
-      registerError.value = 'Erro ao registrar. Tente novamente.';
-    }
-  } catch (error) {
-    registerError.value = 'Erro ao registrar. Verifique sua conexão.';
-  } finally {
-    loading.value = false;
-  }
-};
-
-
-    const navigateToProducts = () => {
-      router.push('/produtos');
+          // Verificando se as credenciais estão corretas
+          const user = usersList.find(u => u.email === email && u.senha === password);
+          
+          if (user) {
+            localStorage.setItem('user', JSON.stringify(user));
+            modal.hide();
+            setTimeout(() => {
+              isUserArea.value = true;
+              router.push('/produtos');
+            }, 100);
+          } else {
+            loginError.value = 'Usuário ou senha incorretos. Tente novamente.';
+          }
+        } else {
+          // Registro
+          const payload = { email, senha: password };
+          const response = await api.post('/Usuario', payload);
+          
+          if (response.status === 201) {
+            alert('Registro realizado com sucesso!');
+            modal.hide();
+            setTimeout(() => {
+              isUserArea.value = true;
+              router.push('/produtos');
+            }, 100);
+          } else {
+            registerError.value = 'Erro ao registrar. Tente novamente.';
+          }
+        }
+      } catch (error) {
+        if (isLogin) {
+          loginError.value = 'Erro ao fazer login. Tente novamente mais tarde.';
+        } else {
+          registerError.value = 'Erro ao registrar. Verifique sua conexão.';
+        }
+      } finally {
+        loading.value = false;
+      }
     };
 
     return {
@@ -232,8 +229,7 @@ const register = async () => {
       registerEmail,
       registerPassword,
       openLoginModal,
-      login,
-      register,
+      authenticate,
       loginModal,
       loginError,
       registerError,
@@ -243,9 +239,6 @@ const register = async () => {
   }
 };
 </script>
-
-
-
 
 <style scoped>
 @import url('https://fonts.googleapis.com/css?family=Montserrat:400,800');
