@@ -1,7 +1,7 @@
 import { createRouter, createWebHistory } from 'vue-router';
 import HomeView from '../views/HomeView.vue';
-import PerfilUser from '../views/PerfilUser.vue';
-import { isAuthenticated } from './auth'; // Importa a função de verificação de autenticação
+import ProductList from '../components/ProductList.vue'; // Importe o componente ProductList
+import { isAuthenticated } from './auth'; // Função de verificação de autenticação
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -12,10 +12,10 @@ const router = createRouter({
       component: HomeView
     },
     {
-      path: '/perfil',
-      name: 'perfilUser',
-      component: PerfilUser,
-      meta: { requiresAuth: true } // Adiciona meta para identificar rotas que requerem autenticação
+      path: '/produtos', // Adicione a rota /produtos
+      name: 'ProductList',
+      component: ProductList,
+      meta: { requiresAuth: true } // Define como rota protegida (se necessário)
     },
   ]
 });
