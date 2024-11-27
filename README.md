@@ -19,16 +19,20 @@
    ```
 
 ### **Abrir o projeto no Visual Studio**
-- Navegue até o arquivo `Eplace.csproj` e abra-o com o Visual Studio.
+- Navegue até o arquivo `Eplace.sln` e abra-o com o Visual Studio.
 
 ### **3. Configuração da base de dados**
 - No terminal do Visual Studio, executar o comando para atualizar o banco de dados:
   
    ```bash
-   dotnet ef database update
+   cd infrastructure
+   ```
+   ```bash
+   dotnet ef database update --startup-project ../presentation --project .
    ```
    
 ### **4. Executar o projeto**
+. Verifique no Visual Studio se o projeto de inicialização é 'Presentention'.
 . Rodar o projeto no Visual Studio (pressionando **F5** ou clicando em "Run").
  **Iniciar o servidor Apache**:
    - Abra o Apache e assegure-se de que ele está em execução.
